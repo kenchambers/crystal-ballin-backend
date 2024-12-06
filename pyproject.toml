@@ -3,7 +3,7 @@ name = "crystal-ballin-backend"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.9.18,<3.10"
 dependencies = [
     "flask>=3.1.0",
     "matplotlib>=3.9.3",
