@@ -5,6 +5,7 @@ import datetime
 from prophet import Prophet
 import yfinance as yf
 import re
+
 load_dotenv()
 
 app = Flask(__name__)
@@ -34,14 +35,14 @@ def predict_crypto_movement(date: str, crypto: str = 'BTC-USD', period: str = '5
         df = ticker.history(period=period)
         
         if df.empty:
-            raise ValueError(f"No data found for {crypto} with period {period}.")
+            raise ValueError("No data found for the given parameters.")
 
         # Prepare data for Prophet
         df = df.copy()
         df.reset_index(inplace=True)
         
-        # Configure pandas to use html5lib instead of lxml
-        pd.options.mode.use_inf_as_na = True
+        # Replace inf values with NaN
+        df.replace([float('inf'), float('-inf')], pd.NA, inplace=True)
         
         data = pd.DataFrame({
             'ds': pd.to_datetime(df['Date']).dt.tz_localize(None),
@@ -67,7 +68,9 @@ def predict_crypto_movement(date: str, crypto: str = 'BTC-USD', period: str = '5
 
         # Generate prediction
         forecast = model.predict(future)
-        return float(forecast['yhat'].values[0])
+        prediction = float(forecast['yhat'].values[0])
+        print(f"Prediction for {date}: {prediction}")
+        return prediction
 
     except Exception as e:
         raise ValueError(f"Prediction error: {str(e)}")
@@ -75,12 +78,16 @@ def predict_crypto_movement(date: str, crypto: str = 'BTC-USD', period: str = '5
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
-        date = request.args.get('date')
+        data = request.get_json()
+
+        print("==================")
+        print(data)
+        date = data.get('date')
         if not date:
             return jsonify({"error": "Date parameter is required"}), 400
         
-        crypto = request.args.get('crypto', 'BTC-USD')
-        period = request.args.get('period', '5y')
+        crypto = data.get('crypto', 'BTC-USD')
+        period = data.get('period', '5y')
         
         predicted_price = predict_crypto_movement(date, crypto, period)
         return jsonify({
