@@ -100,6 +100,7 @@ def predict():
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
     except Exception as e:
+        app.logger.error(f"Error in prediction: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
 if __name__ == '__main__':
