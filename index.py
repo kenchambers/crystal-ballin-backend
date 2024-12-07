@@ -10,7 +10,7 @@ import re
 load_dotenv()
 
 app = Flask(__name__)
-if app.config["ENV"] == "production":
+if app.config["NODE_ENV"] == "production":
     CORS(app, resources={
         r"/predict": {
             "origins": ["https://crystalballin.org"],
@@ -95,7 +95,7 @@ def predict():
         response.headers.add("Access-Control-Allow-Origin", "https://crystalballin.org")
         response.headers.add("Access-Control-Allow-Headers", "Content-Type")
         response.headers.add("Access-Control-Allow-Methods", "POST")
-        
+
     try:
         data = request.get_json()
 
