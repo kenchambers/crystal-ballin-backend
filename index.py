@@ -1,5 +1,6 @@
 from dotenv import load_dotenv
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import pandas as pd
 import datetime
 from prophet import Prophet
@@ -9,6 +10,16 @@ import re
 load_dotenv()
 
 app = Flask(__name__)
+if app.config["ENV"] == "production":
+    CORS(app, resources={
+        r"/predict": {
+            "origins": ["https://crystalballin.org"],
+            "methods": ["POST"],
+            "allow_headers": ["Content-Type"]
+        }
+    })
+else:
+    CORS(app)  # Open CORS policy for local development
 
 def validate_period(period: str) -> bool:
     return bool(re.match(r'^\d+[ydwh]$', period))
