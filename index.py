@@ -14,8 +14,10 @@ if app.config["ENV"] == "production":
     CORS(app, resources={
         r"/predict": {
             "origins": ["https://crystalballin.org"],
-            "methods": ["POST"],
-            "allow_headers": ["Content-Type"]
+            "methods": ["POST", "OPTIONS"],
+            "allow_headers": ["Content-Type"],
+            "expose_headers": ["Content-Type"],
+            "supports_credentials": True
         }
     })
 else:
@@ -88,6 +90,12 @@ def predict_crypto_movement(date: str, crypto: str = 'BTC-USD', period: str = '5
 
 @app.route('/predict', methods=['POST'])
 def predict():
+    if request.method == "OPTIONS":
+        response = make_response()
+        response.headers.add("Access-Control-Allow-Origin", "https://crystalballin.org")
+        response.headers.add("Access-Control-Allow-Headers", "Content-Type")
+        response.headers.add("Access-Control-Allow-Methods", "POST")
+        
     try:
         data = request.get_json()
 
