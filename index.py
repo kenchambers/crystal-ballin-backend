@@ -1,3 +1,4 @@
+import os
 from dotenv import load_dotenv
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -8,9 +9,10 @@ import yfinance as yf
 import re
 
 load_dotenv()
+env = os.getenv('FLASK_ENV')
 
 app = Flask(__name__)
-if app.config["NODE_ENV"] == "production":
+if env == 'production':
     CORS(app, resources={
         r"/predict": {
             "origins": ["https://crystalballin.org"],
